@@ -1,0 +1,58 @@
+<a href="https://colab.research.google.com/github/minsuk-heo/tf2/blob/master/jupyter_notebooks/05.MLP.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+import numpy as np
+
+# softmax practice
+def softmax(x):
+    return np.exp(x) / np.sum(np.exp(x), axis=0)
+scores = [1, 7, 2, 1, 1, 1, 1, 3, 1, 1]
+print(softmax(scores))
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+try:
+  %tensorflow_version 2.x
+except Exception:
+  pass
+
+import tensorflow as tf
+tf.random.set_seed(1)
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Activation
+
+# Get MNIST Data
+
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+
+gray_scale = 255
+x_train /= gray_scale
+x_test /= gray_scale
+
+# MLP Model for classifiation
+
+model = Sequential([
+    Flatten(input_shape=(28, 28)),    # reshape 28 row * 28 column data to 28*28 rows
+    Dense(256, activation='sigmoid'), # dense layer 1
+    Dense(128, activation='sigmoid'), # dense layer 2
+    Dense(10, activation='softmax'),  # dense layer 3
+])
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Train
+
+model.fit(x_train, y_train, epochs=10, batch_size=2000, validation_split = 0.2)
+
+# Test
+
+results = model.evaluate(x_test,  y_test, verbose = 0)
+
+print('test loss, test acc:', results)
